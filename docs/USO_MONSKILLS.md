@@ -36,11 +36,14 @@ revision.
 
 ## Decisiones derivadas
 
-- `PasaporteOrigen.sol` se actualiza a Solidity `^0.8.28`.
+- V2 separa dominios en `RegistroEmpresas.sol` y `PasaporteProductos.sol`:
+  empresas/KYB por un lado, productos QR por otro.
+- `PasaporteOrigen.sol` queda como legado V1 basado en serial.
+- Los contratos activos usan Solidity `^0.8.28`.
 - `foundry.toml` fija `evm_version = "prague"` para el flujo recomendado por
   monskills.
-- `transferirProducto` se agrega porque `duenoActual` representa ownership
-  trustless y pertenece on-chain segun el criterio de `scaffold`.
+- El QR usa `productHash` on-chain y metadata por URI + hash para no guardar
+  datos sensibles en Monad.
 - `docs/HANDOFF_FRONTEND_MONAD.md` y `artifacts/frontend-config.example.json`
   se agregan para que Thomas conecte wallet en Monad Testnet sin depender de
   address dummy ni de nombres de funciones inventados.

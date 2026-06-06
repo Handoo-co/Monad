@@ -1,167 +1,95 @@
-# Onboarding — Handoo OriginPass
-
-Setup completo para nuevos contribuidores. De cero a app corriendo en local en
-menos de 10 minutos.
+# Onboarding - Handoo OriginPass V2
 
 ## 1. Prerrequisitos
 
-| Herramienta | Versión mínima | Para qué |
+| Herramienta | Version minima | Uso |
 | --- | --- | --- |
-| Node.js | 20+ | Frontend (Vite + React) |
-| npm | 10+ | Gestor de paquetes |
-| git | 2.40+ | Clonado y branch management |
-| MetaMask / Rainbow / WalletConnect | última | Firmar transacciones en Monad Testnet |
+| Node.js | 20+ | Frontend Vite/React |
+| npm | 10+ | Dependencias |
+| Git | 2.40+ | Rama `Pacha` |
+| Wallet EVM | actual | Empresa/admin en Monad Testnet |
 
-Opcionales (solo si trabajas en el contrato):
+Opcional para contrato: Foundry (`forge`) o `solc 0.8.28`.
 
-| Herramienta | Para qué |
-| --- | --- |
-| Foundry (`forge`, `cast`) | Tests del contrato, deploy reproducible |
-| `solc 0.8.28` | Compilación local del contrato |
-
-## 2. Clonar y entrar a la rama
+## 2. Setup local
 
 ```bash
 git clone https://github.com/Handoo-co/Monad.git
 cd Monad
 git checkout Pacha
-```
-
-La rama `Pacha` contiene contrato + frontend integrados.
-
-## 3. Instalar dependencias
-
-```bash
 npm install
-```
-
-> Si ves warnings de peer deps, son seguros. RainbowKit 2.2 exige wagmi 2.x;
-> ya está pineado en `package.json`.
-
-## 4. Variables de entorno
-
-Copia el template al archivo local (que NO se commitea):
-
-```bash
 cp ./.env.example ./.env.local
-```
-
-Edita `./env.local` y rellena:
-
-| Variable | Obligatoria | Cómo obtenerla |
-| --- | --- | --- |
-| `VITE_WALLETCONNECT_PROJECT_ID` | Sí (para WalletConnect) | https://cloud.walletconnect.com → crear proyecto → copiar Project ID |
-| `VITE_MONAD_RPC_URL` | No (tiene default) | Default: `https://testnet-rpc.monad.xyz` |
-| `VITE_PASAPORTE_ORIGEN_ADDRESS` | Solo cuando exista deploy real | Lo comparte Emmanuel tras el deploy |
-
-> ⚠️ Nunca commitees el archivo local con variables. `.gitignore` ya lo cubre.
-
-## 5. Conseguir MON de faucet (Monad Testnet)
-
-Para firmar transacciones de prueba necesitas saldo de `MON` en una wallet de
-**prueba** (no tu wallet principal).
-
-1. Crea o usa una wallet vacía dedicada al hackathon.
-2. Agrega Monad Testnet a la wallet:
-   - Chain ID: `10143`
-   - RPC: `https://testnet-rpc.monad.xyz`
-   - Símbolo: `MON`
-   - Explorer: `https://monad-testnet.socialscan.io`
-3. Pide MON al faucet oficial del evento.
-4. Confirma saldo antes de firmar cualquier tx.
-
-## 6. Levantar la app
-
-```bash
 npm run dev
 ```
 
-Abre `http://127.0.0.1:5173`. Deberías ver:
+App local: `http://127.0.0.1:5173`.
 
-- Botón de conectar wallet (RainbowKit).
-- Formularios de emitir / verificar producto.
+## 3. Variables de entorno
 
-> **Importante:** mientras no exista `VITE_PASAPORTE_ORIGEN_ADDRESS`, los hooks
-> reales (`useIssue`, `useVerify`) van a fallar al ejecutar tx. Para iterar
-> antes del deploy, usa los hooks `*.mock.ts` cambiando los imports en
-> `src/components/IssueForm.tsx` y `src/components/VerifyForm.tsx`.
+```bash
+VITE_WALLETCONNECT_PROJECT_ID=...
+VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
+VITE_REGISTRO_EMPRESAS_ADDRESS=
+VITE_PASAPORTE_PRODUCTOS_ADDRESS=
+```
 
-## 7. Validación rápida (smoke test)
+## 4. Flujo del producto
+
+| Vista | Usuario | Acciones |
+| --- | --- | --- |
+| Comprador | Sin wallet | Abre QR y lee producto + empresa desde Monad. |
+| Empresa | Wallet emisora | Solicita registro y registra productos tras aprobacion. |
+| Admin | Wallet admin | Aprueba/rechaza/suspende empresas y revoca productos. |
+
+## 5. Reglas de negocio
+
+- Empresa comercial requiere hash de verificacion de Camara/registro oficial.
+- Empresa artesanal se aprueba por revision admin de Handoo, sin Camara.
+- Producto comercial solo lo emite empresa comercial aprobada.
+- Producto artesanal solo lo emite empresa artesanal aprobada.
+- QR contiene URL publica con chainId, contrato de producto, productId y
+  `productHash`.
+- Metadata completa vive en URI publica; contrato guarda hash + URI.
+
+## 6. Validacion local
 
 ```bash
 npm run lint
+npx tsc --noEmit -p tsconfig.app.json
 npm run build
 ```
 
-Ambos deben pasar sin errores. El warning de `@reown/appkit` sobre
-`/*#__PURE__*/` es de una dependencia transitiva y se puede ignorar.
+Para deploy frontend en Vercel, seguir `docs/DEPLOY_VERCEL.md`. El repo ya
+incluye `vercel.json` con rewrite SPA para rutas QR directas.
 
-## 8. Estructura del repo
+Compilacion Solidity rapida:
 
-```
-.
-├── README.md                          # Entry point
-├── contracts/
-│   └── PasaporteOrigen.sol           # Contrato principal
-├── test/
-│   └── PasaporteOrigen.t.sol         # Tests Foundry
-├── artifacts/
-│   ├── PasaporteOrigen.abi.json      # ABI generada
-│   └── frontend-config.example.json  # Plantilla de config
-├── src/
-│   ├── abi/originPass.ts             # Import del ABI real
-│   ├── config/
-│   │   ├── chains.ts                 # Definición monadTestnet
-│   │   └── wagmi.ts                  # Config wagmi + connectors
-│   ├── hooks/
-│   │   ├── useIssue.ts               # Hook real → emitirProducto
-│   │   ├── useIssue.mock.ts          # Hook mock para desarrollo sin deploy
-│   │   ├── useVerify.ts              # Hook real → verificarPorSerial
-│   │   └── useVerify.mock.ts
-│   ├── components/                   # ConnectButton, IssueForm, VerifyForm, ProductCard
-│   ├── types/index.ts                # Tipos alineados al contrato
-│   └── main.tsx                      # Entry React
-├── docs/                             # Toda la documentación
-├── foundry.toml                      # Config Foundry (evm_version = prague)
-├── package.json
-└── vite.config.ts
+```bash
+npx solc@0.8.28 --abi contracts/RegistroEmpresas.sol contracts/PasaporteProductos.sol
 ```
 
-## 9. Workflow de contribución
+## 7. Estructura relevante
 
-1. Toma una tarea de [`PROXIMOS_PASOS.md`](PROXIMOS_PASOS.md). Cambia su estado
-   a 🔄 cuando empieces.
-2. Crea una rama: `git checkout -b feat/descripcion-corta`.
-3. Commit pequeños con mensajes claros (Conventional Commits: `feat:`, `fix:`,
-   `docs:`, `chore:`).
-4. Antes de PR: `npm run lint && npm run build`.
-5. PR contra `Pacha`. Pide review a Emmanuel.
-6. Al mergear, marca la tarea como ✅ en `PROXIMOS_PASOS.md`.
+```text
+contracts/
+  RegistroEmpresas.sol
+  PasaporteProductos.sol
+  PasaporteOrigen.sol        # legado V1
+src/
+  components/PublicProductView.tsx
+  components/CompanyPortal.tsx
+  components/AdminPanel.tsx
+  abi/handooV2.ts
+public/demo-metadata/
+artifacts/
+  RegistroEmpresas.abi.json
+  PasaporteProductos.abi.json
+```
 
-## 10. Troubleshooting
+## 8. Reglas de oro
 
-| Síntoma | Causa probable | Fix |
-| --- | --- | --- |
-| Wallet no conecta | Falta `VITE_WALLETCONNECT_PROJECT_ID` | Crea proyecto en cloud.walletconnect.com |
-| `Wrong network` en UI | Wallet en red distinta a Monad Testnet | Cambia a Chain ID `10143` desde la wallet |
-| `MarcaNoAutorizada` al emitir | No se ejecutó `registrarMarca` post-deploy | Emmanuel debe correr el paso 0 (ver `GUIA_DEPLOY_REMIX.md`) |
-| `npm install` falla con peer deps | Cache corrupto | `rm -rf node_modules package-lock.json && npm install` |
-| Build falla con error de tipo | TS strict | Revisa `tsconfig.app.json` y corre `npx tsc --noEmit` |
-| Faltan saldos de MON | Wallet no fondeada | Pide faucet, usa solo wallets de prueba |
-
-## 11. Para profundizar
-
-- Estrategia y fases: [`PLAN_MAESTRO_PACHA.md`](PLAN_MAESTRO_PACHA.md).
-- Deploy real: [`GUIA_DEPLOY_REMIX.md`](GUIA_DEPLOY_REMIX.md).
-- Verificación empresarial: [`VERIFICACION_EMPRESARIAL.md`](VERIFICACION_EMPRESARIAL.md).
-- Referencia para frontend: [`HANDOFF_FRONTEND_MONAD.md`](HANDOFF_FRONTEND_MONAD.md).
-- Decisiones técnicas de monskills: [`USO_MONSKILLS.md`](USO_MONSKILLS.md).
-
-## 12. Reglas de oro
-
-- **Cero datos personales on-chain.** Solo hashes y metadata demo.
-- **Cero certificados crudos on-chain.** La verificación empresarial se hace off-chain y solo se ancla como hash.
-- **Cero wallets principales.** Solo wallets de prueba dedicadas al hackathon.
-- **Cero secretos en el repo.** Variables locales nunca al git.
-- **Cero address dummy en producción.** Hasta que Emmanuel comparta el address
-  real, los hooks mock son la única forma de iterar sin romper la demo.
+- Cero secretos en repo.
+- Cero datos personales on-chain.
+- Cero codigos de Camara o certificados crudos on-chain.
+- Diferenciar siempre: empresa verificada vs producto atestado.
+- Usar wallets de prueba con MON de faucet.

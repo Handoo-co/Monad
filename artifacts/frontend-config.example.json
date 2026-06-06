@@ -1,5 +1,5 @@
 {
-  "project": "Handoo OriginPass",
+  "project": "Handoo OriginPass V2",
   "network": {
     "name": "Monad Testnet",
     "chainId": 10143,
@@ -16,39 +16,40 @@
       "monadscan": "https://testnet.monadscan.com"
     }
   },
-  "contract": {
-    "name": "PasaporteOrigen",
-    "address": null,
-    "abiPath": "artifacts/PasaporteOrigen.abi.json",
-    "solidityPath": "contracts/PasaporteOrigen.sol",
-    "functions": {
-      "admin": "administrador",
-      "registerBrand": "registrarMarca",
-      "issueProduct": "emitirProducto",
-      "verifyBySerial": "verificarPorSerial",
-      "getProduct": "obtenerProducto",
-      "transferProduct": "transferirProducto",
-      "revokeProduct": "revocarProducto"
+  "contracts": {
+    "registroEmpresas": {
+      "name": "RegistroEmpresas",
+      "address": null,
+      "abiPath": "artifacts/RegistroEmpresas.abi.json",
+      "solidityPath": "contracts/RegistroEmpresas.sol",
+      "env": "VITE_REGISTRO_EMPRESAS_ADDRESS"
     },
-    "events": {
-      "brandRegistered": "MarcaRegistrada",
-      "productIssued": "ProductoEmitido",
-      "productTransferred": "ProductoTransferido",
-      "productRevoked": "ProductoRevocado"
+    "pasaporteProductos": {
+      "name": "PasaporteProductos",
+      "address": null,
+      "abiPath": "artifacts/PasaporteProductos.abi.json",
+      "solidityPath": "contracts/PasaporteProductos.sol",
+      "env": "VITE_PASAPORTE_PRODUCTOS_ADDRESS"
     }
   },
-  "frontendEnv": {
-    "viteContractAddress": "VITE_PASAPORTE_ORIGEN_ADDRESS",
-    "viteRpcUrl": "VITE_MONAD_RPC_URL",
-    "nextContractAddress": "NEXT_PUBLIC_PASAPORTE_ORIGEN_ADDRESS",
-    "nextRpcUrl": "NEXT_PUBLIC_MONAD_RPC_URL"
+  "functions": {
+    "company": {
+      "request": "solicitarRegistroEmpresa",
+      "approve": "aprobarEmpresa",
+      "reject": "rechazarEmpresa",
+      "suspend": "suspenderEmpresa",
+      "reactivate": "reactivarEmpresa",
+      "getByAccount": "obtenerEmpresaPorCuenta"
+    },
+    "product": {
+      "register": "registrarProducto",
+      "verify": "verificarProducto",
+      "getByHash": "obtenerProductoPorHash",
+      "revoke": "revocarProducto"
+    }
   },
-  "demo": {
-    "brandName": "Handoo Demo Brand",
-    "brandMetadataHash": "0x2f8f9f3a8a9c6e6e7c0d5a4a9c8b7e6f5d4c3b2a19080706050403020100ff00",
-    "serialHash": "0x1d4d8b1b7f6a4c3e2d1c0b9a887766554433221100ffeeddccbbaa9988776655",
-    "productMetadataHash": "0xaabbccddeeff00112233445566778899aabbccddeeff00112233445566778899",
-    "productLine": "Sombrero vueltiao demo",
-    "revokeReasonHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+  "qr": {
+    "route": "/p/:chainId/:productContract/:productId?hash=:productHash",
+    "claim": "Camara/registro verifica empresa; empresa o Handoo atesta origen del producto."
   }
 }

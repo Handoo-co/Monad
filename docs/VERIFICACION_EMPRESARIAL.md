@@ -1,151 +1,101 @@
-# Verificación Empresarial - KYB
+# Verificacion Empresarial y Artesanal - Handoo OriginPass V2
 
-## Objetivo
+## Principio
 
-Antes de autorizar una empresa o marca emisora en Handoo OriginPass, el equipo
-debe comprobar que la entidad existe legalmente y que el certificado presentado
-no fue alterado. En Colombia esto se hace con el código de verificación del
-certificado de Cámara de Comercio; en otros países se usa el registro mercantil,
-registro de compañías, Secretary of State, LEI u órgano equivalente.
+Handoo separa dos afirmaciones:
 
-## Decisión de arquitectura
+1. **Empresa verificada:** la entidad o tienda existe y fue revisada contra una
+   fuente oficial cuando aplica.
+2. **Producto atestado:** el origen/autenticidad del producto lo declara la
+   empresa emisora o Handoo, y queda anclado en Monad.
 
-La verificación legal vive **off-chain**. En Monad solo guardamos el compromiso
-criptográfico de la evidencia mediante `hashMetadatos` en `registrarMarca`.
+La Camara de Comercio no debe presentarse como certificadora de cada producto.
 
-Motivo:
+## Empresa comercial
 
-- Los portales oficiales cambian por país, ciudad y autoridad.
-- Muchos flujos tienen captcha, pago, login, PDF firmado o revisión manual.
-- El certificado puede contener datos personales o sensibles.
-- Cambiar el contrato ahora rompería ABI/frontend sin necesidad.
+Usar este modo cuando la empresa tiene registro formal.
 
-El contrato actual ya soporta el flujo:
+Flujo:
 
-```text
-registrarMarca(cuentaMarca, nombre, hashMetadatosKYB, true)
-```
+1. Empresa entrega certificado o referencia de registro.
+2. Operador revisa fuente oficial: Camara de Comercio en Colombia o registro
+   equivalente internacional.
+3. Se hashea el codigo/evidencia sensible off-chain.
+4. Empresa llama `solicitarRegistroEmpresa` con:
+   - `TipoEmpresa.Comercial`
+   - `ModoVerificacion.CamaraComercio` o `RegistroOficial`
+   - `hashVerificacion != 0`
+5. Admin aprueba con `aprobarEmpresa`.
 
-`hashMetadatosKYB` debe ser un `bytes32` calculado a partir de un registro KYB
-normalizado. No guardar en cadena el código de verificación, NIT, PDF, nombres
-de representantes legales, direcciones, correos ni teléfonos.
+No guardar codigo de verificacion, NIT, certificado, representantes legales,
+telefonos, correos ni direcciones privadas on-chain.
 
-## Flujo MVP Colombia
+## Empresa artesanal
 
-1. La empresa entrega certificado reciente y código de verificación.
-2. El operador identifica la Cámara de Comercio emisora.
-3. El operador entra al portal oficial de esa cámara o al sistema que ella
-   indique.
-4. Digita el código de verificación exactamente como aparece en el certificado.
-5. Compara que razón social, estado, matrícula/registro, renovaciones y fecha
-   coincidan con el documento recibido.
-6. Si todo coincide, genera un registro KYB normalizado y calcula
-   `hashMetadatosKYB`.
-7. El admin del contrato llama `registrarMarca(walletMarca, nombreComercial,
-   hashMetadatosKYB, true)`.
+Usar este modo para talleres o productores que hacen sus propios productos y no
+tienen Camara de Comercio.
 
-Para la demo se puede usar una marca demo con metadata ficticia. No usar
-certificados reales ni datos de terceros en vivo.
+Flujo:
 
-## Modelo de datos off-chain
+1. Artesano solicita registro como `TipoEmpresa.Artesanal`.
+2. El contrato exige `ModoVerificacion.RevisionArtesanalAdmin`.
+3. `hashVerificacion` puede ser `0x00...`.
+4. Admin revisa evidencia no sensible: taller, proceso, ubicacion publica,
+   fotos autorizadas, redes o validacion presencial.
+5. Admin aprueba con `aprobarEmpresa`.
 
-Representar la evidencia como JSON canónico antes de hashearla:
+La UI debe mostrar: **Producto artesanal aprobado por Handoo**. No usar el texto
+"verificado por Camara de Comercio" en este modo.
+
+## Metadata publica
+
+El contrato guarda `metadataURI` y `metadataHash`. El JSON visible puede incluir:
 
 ```json
 {
-  "schema": "handoo.kyb.v1",
-  "country": "CO",
-  "subdivision": "ANT",
-  "authorityName": "Camara de Comercio de Medellin para Antioquia",
-  "registryName": "Registro Mercantil",
-  "registryType": "chamber-of-commerce-certificate",
-  "verificationMethod": "certificate-code-official-portal",
-  "verificationCodeHash": "0x...",
-  "certificateHash": "0x...",
-  "legalNameHash": "0x...",
-  "registryIdHash": "0x...",
-  "status": "active",
-  "verifiedAt": "2026-06-06T00:00:00-05:00",
-  "validUntil": null,
-  "operatorWallet": "0x...",
-  "sourceUrlHash": "0x..."
+  "name": "Taller Artesanal La Montana",
+  "displayName": "La Montana Artesanal",
+  "location": "Santa Elena, Antioquia, Colombia",
+  "description": "Taller artesanal aprobado por revision administrativa de Handoo.",
+  "verificationClaim": "Empresa artesanal aprobada por Handoo."
 }
 ```
 
-Campos obligatorios para MVP:
+Regla: si no quieres que un dato sea publico, no debe estar en la metadata URI.
 
-| Campo | Uso |
-| --- | --- |
-| `country` | ISO 3166-1 alpha-2 (`CO`, `US`, `GB`, etc.). |
-| `subdivision` | Región/estado/departamento cuando el registro no es nacional. |
-| `authorityName` | Entidad oficial consultada. |
-| `registryType` | Tipo de registro o certificado. |
-| `verificationMethod` | Código, número de registro, API, LEI o revisión manual oficial. |
-| `verificationCodeHash` | Hash del código, si existe. Nunca el código plano. |
-| `certificateHash` | Hash del PDF/archivo recibido. |
-| `legalNameHash` | Hash de la razón social normalizada. |
-| `registryIdHash` | Hash del NIT, matrícula, company number o equivalente. |
-| `status` | `active`, `inactive`, `dissolved`, `unknown` o equivalente local. |
-| `verifiedAt` | Fecha/hora de verificación. |
-| `operatorWallet` | Wallet del operador/admin que certificó la revisión. |
+## Adaptadores internacionales futuros
 
-## Adaptadores internacionales
-
-No existe un estándar global único. Handoo debe resolverlo con adaptadores por
-jurisdicción y una interfaz común.
-
-| Jurisdicción | Fuente primaria | Método recomendado |
+| Jurisdiccion | Fuente primaria | Modo |
 | --- | --- | --- |
-| Colombia | Cámaras de Comercio / RUES | Código de verificación del certificado + consulta oficial. |
-| Reino Unido | Companies House | Company number + API oficial para perfil y estado. |
-| Unión Europea | BRIS / registros nacionales | Búsqueda por nombre o número en el país participante. |
-| Estados Unidos | Secretary of State por estado | Entity number/name + estado de la entidad en el portal estatal. |
-| Global complementario | GLEIF | LEI para entidades que ya tienen identificador legal global. |
+| Colombia | Camaras de Comercio / RUES | `CamaraComercio` |
+| Reino Unido | Companies House | `RegistroOficial` |
+| Union Europea | BRIS / registros nacionales | `RegistroOficial` |
+| Estados Unidos | Secretary of State estatal | `RegistroOficial` |
+| Global | GLEIF LEI | Complementario |
 
-Regla: si el país tiene API oficial confiable, usar API. Si no, usar revisión
-manual guiada y guardar solo hashes de evidencia. Agregadores privados pueden
-ayudar a UX, pero no reemplazan la fuente oficial en el MVP.
+Agregadores privados pueden ayudar, pero el MVP debe basarse en fuente oficial o
+revision admin documentada.
 
-## Interfaz futura de backend
+## Checklist admin
 
-No se implementa todavía, pero este es el contrato esperado para reducir
-fricción después del hackathon:
+- [ ] La empresa comercial fue revisada contra fuente oficial.
+- [ ] El codigo/evidencia sensible no se guardo on-chain.
+- [ ] La empresa artesanal tiene evidencia suficiente de produccion propia.
+- [ ] La metadata publica no contiene datos personales innecesarios.
+- [ ] El tipo de empresa coincide con el tipo de producto que emitira.
+- [ ] La UI distingue comercial verificada vs artesanal aprobada.
 
-| Endpoint | Responsabilidad |
-| --- | --- |
-| `POST /api/kyb/start` | Recibe país, autoridad, tipo de certificado y wallet de marca. |
-| `POST /api/kyb/verify` | Ejecuta adapter o deja checklist manual para el operador. |
-| `POST /api/kyb/attest` | Devuelve `hashMetadatosKYB` y payload canónico para auditoría. |
-| `GET /api/kyb/:brandWallet` | Estado de verificación de una marca. |
+## Fuentes de referencia
 
-El backend debe cifrar evidencia si se almacena, aplicar control de acceso y
-mantener logs mínimos. El frontend nunca debe enviar evidencia sensible al
-contrato.
-
-## Checklist para autorizar marca
-
-- [ ] Certificado o registro proviene de fuente oficial.
-- [ ] Código de verificación o número de registro fue validado.
-- [ ] Estado legal permite operar (`active` o equivalente).
-- [ ] Razón social y documento coinciden.
-- [ ] No hay datos personales en el payload on-chain.
-- [ ] `hashMetadatosKYB` fue calculado desde JSON canónico.
-- [ ] `registrarMarca` se ejecuta solo después de completar la revisión.
-
-## Fuentes oficiales de referencia
-
-- Cámara de Comercio de Bogotá: verificación de certificados con código del
-  certificado.
+- Camara de Comercio de Bogota:
   https://www.ccb.org.co/es/tramites-y-consultas/certificados/verificacion-de-certificados
-- Cámara de Comercio de Medellín para Antioquia: e-CER y verificación por
-  código.
+- Camara de Comercio de Medellin:
   https://tramites.camaramedellin.com.co/tramites-virtuales/certificados
-- RUES Colombia: registro empresarial y social administrado por Cámaras de
-  Comercio.
+- RUES Colombia:
   https://app-antiguoprd.rues.org.co/Home/About
-- Companies House Reino Unido: API oficial de datos de compañías.
+- Companies House:
   https://developer.company-information.service.gov.uk
-- BRIS Unión Europea: búsqueda de compañías en registros nacionales.
+- BRIS:
   https://webgate.ec.europa.eu/e-justice/searchBris.do
-- GLEIF: API y búsqueda de LEI.
+- GLEIF:
   https://www.gleif.org/en/lei-data/gleif-api

@@ -1,65 +1,63 @@
-import { useAccount } from 'wagmi'
+import { useMemo, useState } from 'react'
 import { ConnectButton } from './components/ConnectButton'
-import { VerifyForm } from './components/VerifyForm'
-import { IssueForm } from './components/IssueForm'
+import { PublicProductView } from './components/PublicProductView'
+import { CompanyPortal } from './components/CompanyPortal'
+import { AdminPanel } from './components/AdminPanel'
+import { parseProductRoute } from './lib/productUrl'
+
+type View = 'buyer' | 'company' | 'admin'
+
+const navItems: { id: View; label: string }[] = [
+  { id: 'buyer', label: 'Comprador' },
+  { id: 'company', label: 'Empresa' },
+  { id: 'admin', label: 'Admin' },
+]
 
 export default function App() {
-  const { isConnected } = useAccount()
+  const isQrPath = window.location.pathname.split('/').filter(Boolean)[0] === 'p'
+  const route = useMemo(
+    () => parseProductRoute(window.location.pathname, window.location.search),
+    [],
+  )
+  const [view, setView] = useState<View>('buyer')
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
+    <div className="min-h-screen bg-gray-100 text-gray-950">
+      <header className="sticky top-0 z-20 border-b border-gray-200 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-base font-bold text-gray-900">Handoo OriginPass</h1>
-            <p className="text-xs text-gray-400">Pasaporte de autenticidad en Monad</p>
+            <h1 className="text-lg font-bold">Handoo OriginPass V2</h1>
+            <p className="text-sm text-gray-500">QR publico, empresas verificadas y productos artesanales.</p>
           </div>
           <ConnectButton />
         </div>
       </header>
 
-      {/* Estado desconectado */}
-      {!isConnected ? (
-        <div className="flex flex-col items-center justify-center gap-6 px-6 py-24 text-center">
-          <div className="text-5xl">🔏</div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Verifica la autenticidad de tu producto
-            </h2>
-            <p className="mt-2 max-w-sm mx-auto text-sm text-gray-500">
-              Conecta tu wallet para verificar o emitir pasaportes de autenticidad registrados en Monad.
-            </p>
-          </div>
-          <ConnectButton />
-        </div>
-      ) : (
-        <main className="mx-auto max-w-2xl space-y-10 px-4 py-8">
-          {/* Verificación — pantalla principal del comprador */}
-          <section>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Verificar producto</h2>
-              <p className="text-sm text-gray-400">
-                Ingresa el serial o usa los botones de demo.
-              </p>
-            </div>
-            <VerifyForm />
-          </section>
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        {!isQrPath && (
+          <nav className="mb-6 grid grid-cols-3 rounded-lg border border-gray-200 bg-white p-1">
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setView(item.id)}
+                className={`rounded-md px-3 py-2 text-sm font-semibold ${
+                  view === item.id ? 'bg-gray-950 text-white' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        )}
 
-          <div className="border-t border-gray-200" />
-
-          {/* Emisión — solo para la marca autorizada */}
-          <section>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Emitir pasaporte</h2>
-              <p className="text-sm text-gray-400">
-                Solo wallets autorizadas como emisores pueden usar esta sección.
-              </p>
-            </div>
-            <IssueForm />
-          </section>
-        </main>
-      )}
+        {isQrPath || view === 'buyer' ? (
+          <PublicProductView route={route} invalidRoute={isQrPath && !route} />
+        ) : view === 'company' ? (
+          <CompanyPortal />
+        ) : (
+          <AdminPanel />
+        )}
+      </main>
     </div>
   )
 }

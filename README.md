@@ -1,12 +1,21 @@
-# Handoo OriginPass
+# Handoo OriginPass V2
 
-> Pasaporte de autenticidad por unidad física, anclado en Monad Testnet.
-> Hackathon MonadBlitz Medellín.
+> QR publico para verificar origen de productos en Monad Testnet.
+> Empresas comerciales verificadas, talleres artesanales aprobados y productos
+> consultables sin wallet.
 
-Cada producto físico tiene un serial existente. Este proyecto convierte ese
-serial en un **pasaporte verificable on-chain** sin guardar el serial plano, sin
-datos personales, y con tres acciones demo: **emitir**, **verificar**,
-**revocar** (más transferencia de propiedad).
+El comprador escanea un QR y abre una ficha publica. La app consulta Monad y
+muestra:
+
+- empresa emisora y ubicacion declarada;
+- tipo de empresa: comercial verificada o artesanal aprobada;
+- tipo de producto: original comercial o artesanal;
+- estado on-chain del producto;
+- metadata publica verificada por hash.
+
+La Camara de Comercio o registro equivalente verifica la empresa cuando aplica.
+La autenticidad/origen del producto queda atestada por la empresa emisora o por
+Handoo, no por la Camara.
 
 ---
 
@@ -14,19 +23,19 @@ datos personales, y con tres acciones demo: **emitir**, **verificar**,
 
 | Capa | Estado | Detalle |
 | --- | --- | --- |
-| Contrato `PasaporteOrigen.sol` | ✅ Listo | Compilado con `solc 0.8.28`. Tests Foundry escritos. |
-| ABI | ✅ Generada | `artifacts/PasaporteOrigen.abi.json`. |
-| Deploy en Monad Testnet | ⏳ Pendiente | Ver `docs/GUIA_DEPLOY_REMIX.md`. |
-| Verificación empresarial (KYB) | 🔄 Diseñada | Registro de marca requiere evidencia legal off-chain; ver `docs/VERIFICACION_EMPRESARIAL.md`. |
-| Frontend (Vite + React + RainbowKit) | ✅ Integrado | `src/`. Falta apuntar al address real. |
-| Hooks `useIssue` / `useVerify` | ✅ Cableados al ABI real | Usar versiones no-mock cuando exista deploy. |
-| Pitch + submission | ⏳ Pendiente | Ver `docs/PROXIMOS_PASOS.md` §Producto. |
+| `RegistroEmpresas.sol` | Listo | Registro, aprobacion y suspension de empresas. |
+| `PasaporteProductos.sol` | Listo | Productos verificables por QR + `productHash`. |
+| Frontend V2 | Listo | Vistas comprador, empresa y admin. |
+| QR | Listo | URL publica `/p/:chainId/:contract/:productId?hash=:productHash`. |
+| Metadata demo | Lista | `public/demo-metadata/`. |
+| Vercel frontend | Listo para configurar | `vercel.json` + guia de envs. |
+| Deploy en Monad Testnet | Pendiente | Ver `docs/GUIA_DEPLOY_REMIX.md`. |
 
-➡️ **Backlog vivo:** [`docs/PROXIMOS_PASOS.md`](docs/PROXIMOS_PASOS.md).
+`contracts/PasaporteOrigen.sol` queda como legado V1 y no se usa en la app V2.
 
 ---
 
-## Quickstart (5 minutos)
+## Quickstart
 
 ```bash
 git clone https://github.com/Handoo-co/Monad.git
@@ -34,60 +43,54 @@ cd Monad
 git checkout Pacha
 npm install
 cp ./.env.example ./.env.local
-# editar ./env.local con tu WalletConnect Project ID
 npm run dev
 ```
 
-Levanta en `http://127.0.0.1:5173`. Conecta wallet (MetaMask, WalletConnect,
-Rainbow) y cambia a Monad Testnet (Chain ID `10143`).
+Abre `http://127.0.0.1:5173`.
 
-**Setup completo y troubleshooting:** [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
+Variables locales/Vercel:
 
----
+```bash
+VITE_WALLETCONNECT_PROJECT_ID=
+VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
+VITE_REGISTRO_EMPRESAS_ADDRESS=
+VITE_PASAPORTE_PRODUCTOS_ADDRESS=
+```
 
-## Roles y ownership
-
-| Persona | Rol | Carril |
-| --- | --- | --- |
-| Emmanuel | Contrato, on-chain, deploy, debugging | Rama `Pacha` |
-| Miguel Ángel Riveros | Frontend, wallet, demo | `src/` integrado en `Pacha` |
-| Thomas Osorio | Producto, pitch, datos, QA, submission | Rama `Thomas` (integrada) |
-
-**Regla de desacople:** Emmanuel entrega ABI + address; frontend avanza con
-mocks (`*.mock.ts`) mientras tanto; Thomas prepara datos demo + guion.
+Mientras no existan addresses desplegados, la vista comprador muestra una demo
+local. Las vistas empresa/admin quedan bloqueadas hasta configurar contratos.
 
 ---
 
 ## Stack
 
-- **Contrato:** Solidity `^0.8.28`, Foundry, Remix como fallback de deploy.
-- **Frontend:** Vite + React 19 + TypeScript + RainbowKit 2.2 + Wagmi 2.19 + Viem 2.
-- **Red:** Monad Testnet (`10143`, RPC `https://testnet-rpc.monad.xyz`, token `MON`).
-- **Explorer:** Socialscan testnet (`monad-testnet.socialscan.io`).
+- Solidity `^0.8.28`, Foundry config con `evm_version = "prague"`.
+- Monad Testnet `10143`, RPC `https://testnet-rpc.monad.xyz`.
+- Vite + React 19 + TypeScript + RainbowKit/Wagmi/Viem.
+- Metadata publica por URI + hash on-chain.
 
 ---
 
-## Documentación
+## Documentacion
 
-| Doc | Para qué |
+| Doc | Uso |
 | --- | --- |
-| [`docs/PROXIMOS_PASOS.md`](docs/PROXIMOS_PASOS.md) | **Backlog vivo.** Tareas + dueños + prioridades. |
-| [`docs/ONBOARDING.md`](docs/ONBOARDING.md) | Onboarding 5 min para nuevos contribuidores. |
-| [`docs/VERIFICACION_EMPRESARIAL.md`](docs/VERIFICACION_EMPRESARIAL.md) | KYB: registro legal de empresas antes de autorizar marcas. |
-| [`docs/PLAN_MAESTRO_PACHA.md`](docs/PLAN_MAESTRO_PACHA.md) | Estrategia y fases del proyecto. |
-| [`docs/GUIA_DEPLOY_REMIX.md`](docs/GUIA_DEPLOY_REMIX.md) | Playbook de deploy en Remix. |
-| [`docs/HANDOFF_FRONTEND_MONAD.md`](docs/HANDOFF_FRONTEND_MONAD.md) | Referencia: env vars, errores, helpers. |
-| [`docs/USO_MONSKILLS.md`](docs/USO_MONSKILLS.md) | Decisiones derivadas del skill set monskills. |
+| [`docs/PROXIMOS_PASOS.md`](docs/PROXIMOS_PASOS.md) | Backlog vivo V2. |
+| [`docs/ONBOARDING.md`](docs/ONBOARDING.md) | Setup de nuevos contribuidores. |
+| [`docs/GUIA_DEPLOY_REMIX.md`](docs/GUIA_DEPLOY_REMIX.md) | Deploy manual V2. |
+| [`docs/DEPLOY_VERCEL.md`](docs/DEPLOY_VERCEL.md) | Deploy frontend en Vercel. |
+| [`docs/HANDOFF_FRONTEND_MONAD.md`](docs/HANDOFF_FRONTEND_MONAD.md) | ABI, env vars y flujos frontend. |
+| [`docs/VERIFICACION_EMPRESARIAL.md`](docs/VERIFICACION_EMPRESARIAL.md) | KYB comercial y aprobacion artesanal. |
+| [`docs/PLAN_MAESTRO_PACHA.md`](docs/PLAN_MAESTRO_PACHA.md) | Estrategia y fases. |
 
 ---
 
-## Submission (rellenar antes del freeze)
+## Submission
 
 - **Nombre:** Handoo OriginPass.
-- **Frase:** Handoo OriginPass convierte el serial existente de cada producto
-  en un pasaporte verificable en Monad.
+- **Frase:** Handoo OriginPass convierte un QR en una prueba publica de origen
+  y empresa emisora, anclada en Monad.
 - **Repo:** https://github.com/Handoo-co/Monad
-- **Contract address:** _pendiente de deploy_
-- **Explorer link:** _pendiente de deploy_
-- **Demo URL:** _pendiente de host_
-- **Integrantes:** Emmanuel, Miguel Ángel Riveros, Thomas Osorio.
+- **Contracts:** pendiente de deploy V2.
+- **Demo URL:** pendiente de host.
+- **Integrantes:** Emmanuel, Miguel Angel Riveros, Thomas Osorio.
