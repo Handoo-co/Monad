@@ -4,10 +4,12 @@ import { ConnectButton } from './components/ConnectButton'
 import { ProductShowcase } from './components/ProductShowcase'
 import { VerifyForm } from './components/VerifyForm'
 import { IssueForm } from './components/IssueForm'
+import { AdminView } from './components/AdminView'
 
 export default function App() {
   const { isConnected } = useAccount()
   const [pendingSerial, setPendingSerial] = useState<string | undefined>()
+  const [view, setView] = useState<'public' | 'admin'>('public')
 
   const handleShowcaseVerify = (serial: string) => {
     setPendingSerial(serial)
@@ -15,6 +17,25 @@ export default function App() {
       document.getElementById('verify-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 50)
   }
+
+  if (view === 'admin') return (
+    <div>
+      <div className="sticky top-0 z-10 border-b border-gray-100 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+          <button
+            onClick={() => setView('public')}
+            className="flex items-center gap-2 text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors"
+          >
+            ← Volver a la plataforma
+          </button>
+          <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+            Admin
+          </span>
+        </div>
+      </div>
+      <AdminView />
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -30,7 +51,15 @@ export default function App() {
               <p className="text-[11px] text-gray-400 leading-tight">Pasaportes de autenticidad en Monad</p>
             </div>
           </div>
-          <ConnectButton />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setView('admin')}
+              className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+            >
+              Admin
+            </button>
+            <ConnectButton />
+          </div>
         </div>
       </header>
 
