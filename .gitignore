@@ -1,6 +1,8 @@
 # Dependencias
 node_modules/
-lib/
+# lib/ contiene submódulos Foundry; ignorar contenido excepto submodule pointer
+lib/**
+!lib/forge-std
 
 # Artefactos de build
 out/
@@ -8,6 +10,7 @@ cache/
 broadcast/
 dist/
 build/
+foundry.lock
 
 # Entorno y secretos
 .env
@@ -23,3 +26,6 @@ Thumbs.db
 .DS_Store
 .vscode/
 .idea/
+
+# Vercel CLI link state
+.vercel/

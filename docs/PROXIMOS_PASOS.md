@@ -15,10 +15,11 @@
 | --- | --- | --- | --- | --- |
 | C1 | Hecho | P0 | Implementar `RegistroEmpresas.sol` | Empresas comerciales/artesanales. |
 | C2 | Hecho | P0 | Implementar `PasaporteProductos.sol` | Productos QR + `productHash`. |
-| C3 | Pendiente | P0 | Deploy V2 en Monad Testnet | Primero Registro, luego Pasaporte con address de Registro. |
-| C4 | Pendiente | P0 | Configurar envs V2 en Vercel | `VITE_REGISTRO_EMPRESAS_ADDRESS`, `VITE_PASAPORTE_PRODUCTOS_ADDRESS`; guia en `docs/DEPLOY_VERCEL.md`. |
+| C3 | Pendiente | P0 | Deploy V2 en Monad Testnet | One-shot: `DEPLOYER_PK=0x... npm run deploy:testnet`. Script: `script/DesplegarV2.s.sol`. |
+| C4 | Pendiente | P0 | Configurar envs V2 en Vercel | `npm run vercel:envs` (interactivo) o con `--auto`. Guia: `docs/DEPLOY_VERCEL.md`. |
 | C5 | Pendiente | P1 | Verificar contratos en exploradores | Socialscan, MonadVision, Monadscan. |
-| C6 | Pendiente | P1 | Ejecutar `forge test` | Si Foundry esta disponible. |
+| C6 | Hecho | P1 | Ejecutar `forge test` | 15/15 tests pass (9 V2 + 6 V1 legado). Foundry instalado. |
+| C7 | Hecho | P0 | Script de deploy Foundry reproducible | `script/DesplegarV2.s.sol` + `scripts/deploy-v2.sh`. |
 
 ## Producto y UX
 
@@ -42,11 +43,24 @@
 ## Riesgos vivos
 
 - Deploy incompleto: `PasaporteProductos` necesita el address correcto de
-  `RegistroEmpresas`.
+  `RegistroEmpresas`. Mitigado por `script/DesplegarV2.s.sol` (one-shot).
 - QR de red equivocada: la ruta debe usar `10143`.
 - Metadata rota: el contrato puede estar bien aunque el JSON publico no cargue.
 - Claim legal: no prometer que la Camara certifica productos individuales.
 - Gas en Monad: no inflar `gas_limit`.
+
+## Comandos clave
+
+| Tarea | Comando |
+| --- | --- |
+| Compilar contratos | `npm run contracts:build` |
+| Tests del contrato | `npm run contracts:test` |
+| Regenerar ABIs | `npm run contracts:abis` |
+| Deploy V2 a Monad Testnet | `DEPLOYER_PK=0x... npm run deploy:testnet` |
+| Push envs a Vercel | `npm run vercel:envs` |
+| Type-check frontend | `npm run typecheck` |
+| Build frontend | `npm run build` |
+| Lint | `npm run lint` |
 
 ## Code freeze
 

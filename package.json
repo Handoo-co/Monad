@@ -7,7 +7,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "contracts:build": "forge build",
+    "contracts:test": "forge test -vv",
+    "contracts:abis": "forge inspect RegistroEmpresas abi > artifacts/RegistroEmpresas.abi.json && forge inspect PasaporteProductos abi > artifacts/PasaporteProductos.abi.json && forge inspect PasaporteOrigen abi > artifacts/PasaporteOrigen.abi.json",
+    "deploy:testnet": "bash scripts/deploy-v2.sh",
+    "vercel:envs": "bash scripts/vercel-envs.sh"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.11",
