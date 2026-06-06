@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from './components/ConnectButton'
 import { ProductShowcase } from './components/ProductShowcase'
@@ -13,6 +13,18 @@ export default function App() {
   const { isConnected } = useAccount()
   const [pendingSerial, setPendingSerial] = useState<string | undefined>()
   const [view, setView] = useState<View>('public')
+
+  // QR scan: read ?serial= from URL on load and auto-verify
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const serial = params.get('serial')
+    if (serial) {
+      setPendingSerial(serial)
+      setTimeout(() => {
+        document.getElementById('verify-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
+    }
+  }, [])
 
   const handleShowcaseVerify = (serial: string) => {
     setPendingSerial(serial)

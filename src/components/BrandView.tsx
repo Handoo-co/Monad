@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useBrandPassports } from '../hooks/useBrandPassports.mock'
 import { EXPLORER_URL } from '../config/chains'
+import { QRCodeLink } from './QRCodeLink'
 import type { AdminProduct } from '../data/adminDemo'
 
 type Filter = 'all' | 'active' | 'revoked'
@@ -185,6 +186,7 @@ function ProductRow({ product: p, revokeState, onRevoke }: {
   onRevoke: () => void
 }) {
   const isBeingRevoked = revokeState.serial === p.serial && (revokeState.isPending || revokeState.isConfirming)
+  const [showQr, setShowQr] = useState(false)
 
   return (
     <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -201,11 +203,18 @@ function ProductRow({ product: p, revokeState, onRevoke }: {
       </div>
 
       {/* Meta + actions */}
-      <div className="ml-6 flex items-center gap-4 sm:ml-0">
+      <div className="ml-6 flex items-center gap-3 sm:ml-0">
         <div className="text-right">
           <p className="text-xs text-gray-400">Emitido</p>
           <p className="text-xs font-medium text-gray-700">{p.issuedAt}</p>
         </div>
+        <button
+          onClick={() => setShowQr(v => !v)}
+          title="Ver QR"
+          className="rounded-lg border border-gray-100 px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-200 transition-colors"
+        >
+          QR
+        </button>
         <a
           href={`${EXPLORER_URL}/tx/${p.txHash}`}
           target="_blank"
@@ -226,6 +235,19 @@ function ProductRow({ product: p, revokeState, onRevoke }: {
           </button>
         )}
       </div>
+
+      {/* Inline QR panel */}
+      {showQr && (
+        <div className="ml-6 mt-1 flex items-center gap-3 sm:col-span-2">
+          <QRCodeLink serial={p.serial} size={96} />
+          <div>
+            <p className="text-[11px] font-medium text-gray-500">Escanea para verificar</p>
+            <p className="mt-0.5 break-all font-mono text-[10px] text-gray-400">
+              {window.location.origin}?serial={p.serial}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

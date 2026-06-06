@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import type { Product } from '../types'
 import { EXPLORER_URL } from '../config/chains'
+import { QRCodeLink } from './QRCodeLink'
 
 type Props = {
   product: Product | null
@@ -10,6 +12,7 @@ type Props = {
 }
 
 export function VerificationSeal({ product, isLoading, notFound, serial, brandName }: Props) {
+  const [showQr, setShowQr] = useState(false)
   if (isLoading) return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-gray-100 bg-white px-8 py-12 text-center shadow-sm">
       <div className="relative h-12 w-12">
@@ -128,6 +131,30 @@ export function VerificationSeal({ product, isLoading, notFound, serial, brandNa
             <p className="text-xs text-amber-600 mt-0.5">
               Este pasaporte fue revocado por el emisor. No compres ni revises esta unidad como auténtica.
             </p>
+          </div>
+        )}
+
+        {/* QR compartir */}
+        {isActive && serial && (
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+            <button
+              onClick={() => setShowQr(v => !v)}
+              className="flex w-full items-center justify-between text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <span>Compartir verificación por QR</span>
+              <span className="text-gray-400">{showQr ? '▲' : '▼'}</span>
+            </button>
+            {showQr && (
+              <div className="mt-3 flex items-center gap-4">
+                <QRCodeLink serial={serial} size={80} />
+                <div>
+                  <p className="text-[11px] text-gray-500">El comprador escanea este QR y confirma la autenticidad directamente en Monad.</p>
+                  <p className="mt-1 break-all font-mono text-[10px] text-gray-400">
+                    {window.location.origin}?serial={serial}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
