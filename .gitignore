@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+lib/
+
+# Artefactos de build
+out/
+cache/
+broadcast/
+dist/
+build/
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema / editor
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/

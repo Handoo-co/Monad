@@ -1,0 +1,54 @@
+{
+  "project": "Handoo OriginPass",
+  "network": {
+    "name": "Monad Testnet",
+    "chainId": 10143,
+    "chainIdHex": "0x279f",
+    "nativeCurrency": {
+      "name": "MON",
+      "symbol": "MON",
+      "decimals": 18
+    },
+    "rpcUrl": "https://testnet-rpc.monad.xyz",
+    "explorers": {
+      "socialscan": "https://monad-testnet.socialscan.io",
+      "monadVision": "https://testnet.monadvision.com",
+      "monadscan": "https://testnet.monadscan.com"
+    }
+  },
+  "contract": {
+    "name": "PasaporteOrigen",
+    "address": null,
+    "abiPath": "artifacts/PasaporteOrigen.abi.json",
+    "solidityPath": "contracts/PasaporteOrigen.sol",
+    "functions": {
+      "admin": "administrador",
+      "registerBrand": "registrarMarca",
+      "issueProduct": "emitirProducto",
+      "verifyBySerial": "verificarPorSerial",
+      "getProduct": "obtenerProducto",
+      "transferProduct": "transferirProducto",
+      "revokeProduct": "revocarProducto"
+    },
+    "events": {
+      "brandRegistered": "MarcaRegistrada",
+      "productIssued": "ProductoEmitido",
+      "productTransferred": "ProductoTransferido",
+      "productRevoked": "ProductoRevocado"
+    }
+  },
+  "frontendEnv": {
+    "viteContractAddress": "VITE_PASAPORTE_ORIGEN_ADDRESS",
+    "viteRpcUrl": "VITE_MONAD_RPC_URL",
+    "nextContractAddress": "NEXT_PUBLIC_PASAPORTE_ORIGEN_ADDRESS",
+    "nextRpcUrl": "NEXT_PUBLIC_MONAD_RPC_URL"
+  },
+  "demo": {
+    "brandName": "Handoo Demo Brand",
+    "brandMetadataHash": "0x2f8f9f3a8a9c6e6e7c0d5a4a9c8b7e6f5d4c3b2a19080706050403020100ff00",
+    "serialHash": "0x1d4d8b1b7f6a4c3e2d1c0b9a887766554433221100ffeeddccbbaa9988776655",
+    "productMetadataHash": "0xaabbccddeeff00112233445566778899aabbccddeeff00112233445566778899",
+    "productLine": "Sombrero vueltiao demo",
+    "revokeReasonHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+  }
+}
