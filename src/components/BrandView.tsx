@@ -1,16 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useBrandPassports } from '../hooks/useBrandPassports.mock'
 import { EXPLORER_URL } from '../config/chains'
 import { QRCodeLink } from './QRCodeLink'
 import { ConnectButton } from './ConnectButton'
+import { ADMIN_BRANDS } from '../data/adminDemo'
 import type { AdminProduct } from '../data/adminDemo'
 
 type Filter = 'all' | 'active' | 'revoked'
 
 export function BrandView() {
-  const { brand, products, revoke, revokeState, resetRevoke } = useBrandPassports()
+  const [selectedBrandIdx, setSelectedBrandIdx] = useState(0)
+  const { brand, products, revoke, revokeState, resetRevoke } = useBrandPassports(selectedBrandIdx)
   const [filter, setFilter] = useState<Filter>('all')
   const [confirmingSerial, setConfirmingSerial] = useState<string | null>(null)
+
+  useEffect(() => {
+    setFilter('all')
+    setConfirmingSerial(null)
+  }, [selectedBrandIdx])
 
   if (!brand) return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -50,6 +57,41 @@ export function BrandView() {
 
   return (
     <div className="space-y-6">
+      {/* Company selector */}
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Seleccionar empresa</p>
+        <div className="flex flex-wrap gap-2">
+          {ADMIN_BRANDS.map((b, i) => (
+            <button
+              key={b.id}
+              onClick={() => setSelectedBrandIdx(i)}
+              className={`flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 text-left transition-all ${
+                selectedBrandIdx === i
+                  ? 'border-purple-200 bg-purple-50 shadow-sm'
+                  : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold ${
+                selectedBrandIdx === i ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'
+              }`}>
+                {b.name[0]}
+              </div>
+              <div className="min-w-0">
+                <p className={`text-sm font-semibold leading-none ${
+                  selectedBrandIdx === i ? 'text-purple-900' : 'text-gray-800'
+                }`}>{b.name}</p>
+                <p className="mt-0.5 truncate text-xs text-gray-400">{b.category}</p>
+              </div>
+              {b.status === 'suspended' && (
+                <span className="ml-1 shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                  Suspendida
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Brand identity card */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between gap-4">
@@ -62,10 +104,17 @@ export function BrandView() {
               <p className="text-xs text-gray-500">{brand.category}</p>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            Activa
-          </span>
+          {brand.status === 'active' ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Activa
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              Suspendida
+            </span>
+          )}
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">

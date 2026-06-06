@@ -6,6 +6,7 @@ import { VerifyForm } from './components/VerifyForm'
 import { IssueForm } from './components/IssueForm'
 import { AdminView } from './components/AdminView'
 import { BrandView } from './components/BrandView'
+import { ProductPage } from './components/ProductPage'
 
 type View = 'public' | 'brand' | 'admin'
 
@@ -13,18 +14,25 @@ export default function App() {
   const { isConnected } = useAccount()
   const [pendingSerial, setPendingSerial] = useState<string | undefined>()
   const [view, setView] = useState<View>('public')
+  const [qrSerial, setQrSerial] = useState<string | null>(null)
 
-  // QR scan: read ?serial= from URL on load and auto-verify
+  // QR scan: read ?serial= from URL and open dedicated product page
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const serial = params.get('serial')
-    if (serial) {
-      setPendingSerial(serial)
-      setTimeout(() => {
-        document.getElementById('verify-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 50)
-    }
+    if (serial) setQrSerial(serial)
   }, [])
+
+  // Product page from QR scan
+  if (qrSerial) return (
+    <ProductPage
+      serial={qrSerial}
+      onBack={() => {
+        setQrSerial(null)
+        window.history.replaceState(null, '', window.location.pathname)
+      }}
+    />
+  )
 
   const handleShowcaseVerify = (serial: string) => {
     setPendingSerial(serial)

@@ -19,8 +19,7 @@ type UseBrandPassportsReturn = {
   resetRevoke: () => void
 }
 
-// En la demo, cualquier wallet conectada se mapea a Tejeduría Zenú
-export function useBrandPassports(): UseBrandPassportsReturn {
+export function useBrandPassports(brandIndex = 0): UseBrandPassportsReturn {
   const { address } = useAccount()
   const [revokeState, setRevokeState] = useState<RevokeState>({
     serial: null,
@@ -30,8 +29,7 @@ export function useBrandPassports(): UseBrandPassportsReturn {
     error: null,
   })
 
-  // Demo: wallet conectada = primera marca registrada
-  const brand = address ? ADMIN_BRANDS[0] : null
+  const brand = address ? ADMIN_BRANDS[brandIndex] : null
   const products = brand
     ? ADMIN_PRODUCTS.filter(p => p.brand === brand.name)
     : []
