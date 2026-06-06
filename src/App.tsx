@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from './components/ConnectButton'
 import { ProductShowcase } from './components/ProductShowcase'
@@ -9,6 +9,18 @@ export default function App() {
   const { isConnected } = useAccount()
   const [pendingSerial, setPendingSerial] = useState<string | undefined>()
 
+  // Read serial from URL query string and auto‑scroll to verify section
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const serial = params.get('serial')
+    if (serial) {
+      setPendingSerial(serial)
+      setTimeout(() => {
+        document.getElementById('verify-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
+    }
+  }, [])
+
   const handleShowcaseVerify = (serial: string) => {
     setPendingSerial(serial)
     setTimeout(() => {
@@ -17,20 +29,24 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-[rgba(113,53,242,0.25)] bg-primary text-white shadow-[0_4px_20px_rgba(28,3,64,0.15)]">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600 text-white text-base font-bold">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-white text-base font-bold">
               H
             </div>
             <div>
-              <h1 className="text-sm font-bold text-gray-900 leading-none">Handoo OriginPass</h1>
-              <p className="text-[11px] text-gray-400 leading-tight">Pasaportes de autenticidad en Monad</p>
+              <h1 className="text-sm font-bold text-white leading-none">Handoo OriginPass</h1>
+              <p className="text-[11px] text-white/80 leading-tight">Pasaportes de autenticidad en Monad</p>
             </div>
           </div>
-          <ConnectButton />
+          <div className="flex items-center">
+          <div className="flex items-center gap-1 bg-white/10 border border-secondary rounded-md px-2 py-1 hover:bg-tertiary transition-colors">
+            <ConnectButton />
+          </div>
+        </div>
         </div>
       </header>
 
@@ -106,7 +122,11 @@ export default function App() {
                     Conecta tu wallet para emitir pasaportes de autenticidad a tus productos.
                   </p>
                   <div className="mt-4 flex justify-center">
-                    <ConnectButton />
+                    <div className="flex items-center">
+          <div className="flex items-center gap-1 bg-white/10 border border-secondary rounded-md px-2 py-1 hover:bg-tertiary transition-colors">
+            <ConnectButton />
+          </div>
+        </div>
                   </div>
                 </div>
               )}

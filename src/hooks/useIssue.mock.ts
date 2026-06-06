@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { UseIssueReturn } from '../types'
+import type { UseIssueReturn } from '../types/index'
 
 export function useIssue(): UseIssueReturn {
   const [isPending, setIsPending] = useState(false)

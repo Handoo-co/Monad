@@ -1,0 +1,6 @@
+{
+  "name": "Handoo OriginPass Dashboard",
+  "description": "Authenticity tracking map and digital origin passport minting dashboard on Monad Testnet.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

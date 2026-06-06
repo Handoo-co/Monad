@@ -1,4 +1,4 @@
-import type { Product } from '../types'
+import type { Product } from '../types/index'
 import { EXPLORER_URL } from '../config/chains'
 
 type Props = {
@@ -29,15 +29,15 @@ export function ProductCard({ product, isLoading, notFound }: Props) {
 
   if (!product) return null
 
-  const isActive = product.status === 0
+  const isActive = product.status === "Valid"
   const issuedDate = new Date(Number(product.issuedAt) * 1000).toLocaleDateString('es-CO', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
 
   return (
-    <div className={`rounded-xl border p-6 ${isActive ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+    <div className={`rounded-xl border bg-white shadow-card ${isActive ? 'border-accent' : 'border-secondary'}`}>
       <div className="flex items-start justify-between gap-4">
-        <span className={`rounded-full px-4 py-1 text-sm font-bold tracking-wide ${isActive ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+        <span className={`rounded-full px-4 py-1 text-sm font-bold tracking-wide ${isActive ? 'bg-accent text-white' : 'bg-secondary text-white'}`}>
           {isActive ? '✓ ORIGINAL' : '✗ REVOCADO'}
         </span>
         <span className="text-xs text-gray-400">{issuedDate}</span>

@@ -1,4 +1,4 @@
-import type { Product } from '../types'
+import type { Product } from '../types/index'
 import { EXPLORER_URL } from '../config/chains'
 
 type Props = {
@@ -13,8 +13,8 @@ export function VerificationSeal({ product, isLoading, notFound, serial, brandNa
   if (isLoading) return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-gray-100 bg-white px-8 py-12 text-center shadow-sm">
       <div className="relative h-12 w-12">
-        <div className="absolute inset-0 animate-spin rounded-full border-2 border-purple-100 border-t-purple-600" />
-        <div className="absolute inset-2 rounded-full bg-purple-50" />
+        <div className="absolute inset-0 animate-spin rounded-full border-2 border-accent border-t-accent" />
+        <div className="absolute inset-2 rounded-full bg-neutral" />
       </div>
       <div>
         <p className="text-sm font-medium text-gray-700">Consultando Monad Testnet</p>
@@ -24,20 +24,20 @@ export function VerificationSeal({ product, isLoading, notFound, serial, brandNa
   )
 
   if (notFound) return (
-    <div className="overflow-hidden rounded-2xl border border-red-100 bg-white shadow-sm">
-      <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-5">
+    <div className="overflow-hidden rounded-2xl border border-secondary bg-white shadow-sm">
+      <div className="bg-gradient-to-r from-secondary to-accent px-6 py-5">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-xl font-bold text-white">
             ✗
           </div>
           <div>
             <p className="font-bold text-white">Sin registro en cadena</p>
-            <p className="text-xs text-red-100">No encontrado en Monad Testnet</p>
+            <p className="text-xs text-secondary">No encontrado en Monad Testnet</p>
           </div>
         </div>
       </div>
       <div className="p-5 space-y-3">
-        <div className="rounded-xl bg-red-50 border border-red-100 p-4">
+        <div className="rounded-xl bg-red-50 border border-secondary p-4">
           <p className="text-sm font-semibold text-red-800">Posible falsificación</p>
           <p className="text-xs text-red-600 mt-1">
             El serial <span className="font-mono font-bold">{serial}</span> no tiene pasaporte
@@ -53,7 +53,7 @@ export function VerificationSeal({ product, isLoading, notFound, serial, brandNa
 
   if (!product) return null
 
-  const isActive = product.status === 0
+  const isActive = product.status === "Valid"
   const issuedDate = new Date(Number(product.issuedAt) * 1000).toLocaleDateString('es-CO', {
     year: 'numeric', month: 'long', day: 'numeric',
   })

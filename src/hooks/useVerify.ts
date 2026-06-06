@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { usePublicClient } from 'wagmi'
 import { keccak256, toHex } from 'viem'
 import { originPassAbi, ORIGINPASS_ADDRESS } from '../abi/originPass'
-import type { UseVerifyReturn, Product } from '../types'
+import type { UseVerifyReturn, Product } from '../types/index'
 
 export function useVerify(): UseVerifyReturn {
   const publicClient = usePublicClient()

@@ -11,7 +11,7 @@ export function ConnectButton() {
     <div className="flex flex-col items-center gap-2">
       <RKConnectButton />
       {isWrongNetwork && (
-        <div className="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-800">
+        <div className="flex items-center gap-2 rounded-lg border border-secondary/30 bg-secondary/10 px-4 py-2 text-sm text-secondary">
           <span>Red incorrecta.</span>
           <button
             onClick={() => switchChain({ chainId: 10143 })}

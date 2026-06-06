@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { UseVerifyReturn, Product } from '../types'
+import type { UseVerifyReturn, Product } from '../types/index'
 import { DEMO_SERIALS } from '../data/demo'
 
 // Simula los tres escenarios de la demo sin necesitar el contrato
@@ -10,7 +10,7 @@ const MOCK_PRODUCTS: Record<string, Product | 'notfound'> = {
     metadataHash: '0x0000000000000000000000000000000000000000000000000000000000000002',
     productLine: 'Sombrero Vueltiao',
     owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    status: 0,
+    status: "Valid",
     issuedAt: BigInt(1717689600),
   },
   [DEMO_SERIALS.revoked]: {
@@ -19,7 +19,7 @@ const MOCK_PRODUCTS: Record<string, Product | 'notfound'> = {
     metadataHash: '0x0000000000000000000000000000000000000000000000000000000000000004',
     productLine: 'Sombrero Vueltiao',
     owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-    status: 1,
+    status: "Revoked",
     issuedAt: BigInt(1717689600),
   },
   [DEMO_SERIALS.fake]: 'notfound',

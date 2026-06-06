@@ -1,4 +1,4 @@
-export type ProductStatus = 0 | 1 // 0 = Active, 1 = Revoked
+export type ProductStatus = "Valid" | "Sold" | "Revoked" // status strings
 
 export type Product = {
   issuer: `0x${string}`
@@ -7,6 +7,12 @@ export type Product = {
   productLine: string
   owner: `0x${string}`
   status: ProductStatus
+  lat?: number
+  lng?: number
+  isSimulated?: boolean
+  description?: string
+  brand?: string
+  locationName?: string
   issuedAt: bigint
 }
 
