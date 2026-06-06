@@ -1,13 +1,23 @@
 # Plan Maestro Pacha - Handoo OriginPass
 
+> **Para tareas vivas, consulta [`PROXIMOS_PASOS.md`](PROXIMOS_PASOS.md).**
+> Este documento mantiene la **estrategia** y el **mapa de fases**.
+
+## Estado de fases (resumen)
+
+| Fase | Estado | Detalle |
+| --- | --- | --- |
+| Fase 0 — Base operativa | ✅ Hecho | Wallets, faucet, Chain ID y explorer confirmados. |
+| Fase 1 — Contrato | ✅ Hecho | `PasaporteOrigen.sol` compilado, ABI generada, tests Foundry escritos. |
+| Fase 2 — Deploy | ⏳ Pendiente | Falta deploy real en Monad Testnet + `registrarMarca`. |
+| Fase 3 — Handoff a frontend | ✅ Hecho | App Vite/React integrada en `src/` con ABI real. |
+| Fase 4 — Integración y debugging | 🔄 En curso | Bloqueada parcialmente por Fase 2 (address real). |
+| Fase 5 — Freeze y submission | ⏳ Pendiente | Pitch, capturas, formulario. |
+
 ## Definicion de hecho
 
-La rama `Pacha` esta lista cuando existe un plan operativo para ejecutar el rol
-de Emmanuel sin bloquear a frontend ni pitch: contrato definido, fases claras,
-handoff de ABI/address, criterios de prueba y riesgos de demo documentados.
-
-Este primer commit no implementa el contrato ni el frontend. Fija el plan maestro
-para que el equipo ejecute por fases durante la hackathon.
+La rama `Pacha` está lista cuando: contrato desplegado, frontend conectado al
+address real, demo end-to-end funcional, submission enviado.
 
 ## Contexto y decision de producto
 
@@ -37,7 +47,7 @@ guion, capturas y formulario.
 
 ## Fases de ejecucion
 
-### Fase 0 - Base operativa
+### Fase 0 - Base operativa ✅
 
 - Confirmar wallets de prueba, nunca wallets principales.
 - Confirmar MON de faucet en las tres wallets.
@@ -48,7 +58,7 @@ guion, capturas y formulario.
 
 Salida esperada: todos pueden firmar una transaccion y abrir un tx hash.
 
-### Fase 1 - Contrato
+### Fase 1 - Contrato ✅
 
 Crear `PasaporteOrigen.sol` con Solidity `^0.8.28`.
 
@@ -81,7 +91,7 @@ Extra solo si sobra tiempo:
 - Metadata off-chain mas rica para demo.
 - Busqueda/indexacion historica de eventos si el frontend la necesita.
 
-### Fase 2 - Deploy
+### Fase 2 - Deploy ⏳
 
 - Si se usa Foundry, compilar con `solc_version = "0.8.28"` y
   `evm_version = "prague"`.
@@ -102,7 +112,7 @@ Artefactos de esta fase:
 - ABI para frontend: `artifacts/PasaporteOrigen.abi.json`.
 - Config de handoff: `artifacts/frontend-config.example.json`.
 
-### Fase 3 - Handoff a frontend
+### Fase 3 - Handoff a frontend ✅
 
 Entregar a frontend:
 
@@ -129,7 +139,7 @@ Frontend recomendado:
 - `useWriteContract` + `useWaitForTransactionReceipt` para emitir, transferir
   y revocar.
 
-### Fase 4 - Integracion y debugging
+### Fase 4 - Integracion y debugging 🔄
 
 Flujo base:
 
@@ -158,7 +168,7 @@ Estados de UI que no pueden faltar:
 - Mostrar costo estimado desde `gasLimit * gasPrice`; en Monad se cobra por
   gas limit, no por gas usado.
 
-### Fase 5 - Freeze y submission
+### Fase 5 - Freeze y submission ⏳
 
 Antes de freeze:
 
