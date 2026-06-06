@@ -17,6 +17,7 @@ datos personales, y con tres acciones demo: **emitir**, **verificar**,
 | Contrato `PasaporteOrigen.sol` | ✅ Listo | Compilado con `solc 0.8.28`. Tests Foundry escritos. |
 | ABI | ✅ Generada | `artifacts/PasaporteOrigen.abi.json`. |
 | Deploy en Monad Testnet | ⏳ Pendiente | Ver `docs/GUIA_DEPLOY_REMIX.md`. |
+| Verificación empresarial (KYB) | 🔄 Diseñada | Registro de marca requiere evidencia legal off-chain; ver `docs/VERIFICACION_EMPRESARIAL.md`. |
 | Frontend (Vite + React + RainbowKit) | ✅ Integrado | `src/`. Falta apuntar al address real. |
 | Hooks `useIssue` / `useVerify` | ✅ Cableados al ABI real | Usar versiones no-mock cuando exista deploy. |
 | Pitch + submission | ⏳ Pendiente | Ver `docs/PROXIMOS_PASOS.md` §Producto. |
@@ -32,7 +33,7 @@ git clone https://github.com/Handoo-co/Monad.git
 cd Monad
 git checkout Pacha
 npm install
-cp ./env.example ./env.local
+cp ./.env.example ./.env.local
 # editar ./env.local con tu WalletConnect Project ID
 npm run dev
 ```
@@ -72,6 +73,7 @@ mocks (`*.mock.ts`) mientras tanto; Thomas prepara datos demo + guion.
 | --- | --- |
 | [`docs/PROXIMOS_PASOS.md`](docs/PROXIMOS_PASOS.md) | **Backlog vivo.** Tareas + dueños + prioridades. |
 | [`docs/ONBOARDING.md`](docs/ONBOARDING.md) | Onboarding 5 min para nuevos contribuidores. |
+| [`docs/VERIFICACION_EMPRESARIAL.md`](docs/VERIFICACION_EMPRESARIAL.md) | KYB: registro legal de empresas antes de autorizar marcas. |
 | [`docs/PLAN_MAESTRO_PACHA.md`](docs/PLAN_MAESTRO_PACHA.md) | Estrategia y fases del proyecto. |
 | [`docs/GUIA_DEPLOY_REMIX.md`](docs/GUIA_DEPLOY_REMIX.md) | Playbook de deploy en Remix. |
 | [`docs/HANDOFF_FRONTEND_MONAD.md`](docs/HANDOFF_FRONTEND_MONAD.md) | Referencia: env vars, errores, helpers. |

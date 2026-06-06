@@ -37,11 +37,17 @@ ABI y la direccion del contrato.
 Antes de emitir productos, autorizar la marca demo. Si este paso no se ejecuta,
 `emitirProducto` revierte con `MarcaNoAutorizada`.
 
+Para marcas reales, este paso requiere verificación empresarial previa. En
+Colombia se valida el código de verificación del certificado de Cámara de
+Comercio; en otros países se usa el registro oficial equivalente. Ver
+`docs/VERIFICACION_EMPRESARIAL.md`.
+
 Valores recomendados para la demo:
 
 - `cuentaMarca`: la misma wallet de prueba que desplego el contrato.
 - `nombre`: `Handoo Demo Brand`.
-- `hashMetadatos`: un `bytes32` no nulo que represente metadata demo.
+- `hashMetadatos`: un `bytes32` no nulo que represente metadata demo o
+  `hashMetadatosKYB`.
 - `autorizada`: `true`.
 
 Ejemplo de `hashMetadatos` valido para Remix:
@@ -63,7 +69,7 @@ registrarMarca(
 
 ## Datos de prueba para emitir producto
 
-Usar hashes demo, no seriales reales ni datos personales.
+Usar hashes demo, no seriales reales, certificados reales ni datos personales.
 
 `hashSerial`:
 
@@ -125,6 +131,7 @@ Despues del deploy, entregar:
 
 - Direccion del contrato.
 - Link del contrato en explorer.
+- Hash de metadata KYB usado para la marca demo (sin evidencia cruda).
 - ABI: `artifacts/PasaporteOrigen.abi.json`.
 - Config base: `artifacts/frontend-config.example.json`.
 - Handoff wallet/contrato: `docs/HANDOFF_FRONTEND_MONAD.md`.

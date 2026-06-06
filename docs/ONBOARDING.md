@@ -43,7 +43,7 @@ npm install
 Copia el template al archivo local (que NO se commitea):
 
 ```bash
-cp ./env.example ./env.local
+cp ./.env.example ./.env.local
 ```
 
 Edita `./env.local` y rellena:
@@ -153,12 +153,14 @@ Ambos deben pasar sin errores. El warning de `@reown/appkit` sobre
 
 - Estrategia y fases: [`PLAN_MAESTRO_PACHA.md`](PLAN_MAESTRO_PACHA.md).
 - Deploy real: [`GUIA_DEPLOY_REMIX.md`](GUIA_DEPLOY_REMIX.md).
+- Verificación empresarial: [`VERIFICACION_EMPRESARIAL.md`](VERIFICACION_EMPRESARIAL.md).
 - Referencia para frontend: [`HANDOFF_FRONTEND_MONAD.md`](HANDOFF_FRONTEND_MONAD.md).
 - Decisiones técnicas de monskills: [`USO_MONSKILLS.md`](USO_MONSKILLS.md).
 
 ## 12. Reglas de oro
 
 - **Cero datos personales on-chain.** Solo hashes y metadata demo.
+- **Cero certificados crudos on-chain.** La verificación empresarial se hace off-chain y solo se ancla como hash.
 - **Cero wallets principales.** Solo wallets de prueba dedicadas al hackathon.
 - **Cero secretos en el repo.** Variables locales nunca al git.
 - **Cero address dummy en producción.** Hasta que Emmanuel comparta el address

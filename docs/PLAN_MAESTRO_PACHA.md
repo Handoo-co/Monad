@@ -11,19 +11,28 @@
 | Fase 1 — Contrato | ✅ Hecho | `PasaporteOrigen.sol` compilado, ABI generada, tests Foundry escritos. |
 | Fase 2 — Deploy | ⏳ Pendiente | Falta deploy real en Monad Testnet + `registrarMarca`. |
 | Fase 3 — Handoff a frontend | ✅ Hecho | App Vite/React integrada en `src/` con ABI real. |
+| Verificación empresarial / KYB | 🔄 Diseñada | Empresas se autorizan off-chain y se ancla solo `hashMetadatos`. |
 | Fase 4 — Integración y debugging | 🔄 En curso | Bloqueada parcialmente por Fase 2 (address real). |
 | Fase 5 — Freeze y submission | ⏳ Pendiente | Pitch, capturas, formulario. |
 
 ## Definicion de hecho
 
-La rama `Pacha` está lista cuando: contrato desplegado, frontend conectado al
-address real, demo end-to-end funcional, submission enviado.
+La rama `Pacha` está lista cuando: contrato desplegado, marca demo autorizada
+con verificación empresarial documentada, frontend conectado al address real,
+demo end-to-end funcional y submission enviado.
 
 ## Contexto y decision de producto
 
 Handoo OriginPass certifica productos fisicos por unidad usando el serial que la
 empresa ya tiene. El serial no se guarda plano: se calcula un `serialHash` y se
 registra en Monad junto con metadatos publicos de demo.
+
+Para que una empresa pueda emitir pasaportes, primero debe pasar verificación
+empresarial (KYB). En Colombia el MVP usa el código de verificación del
+certificado de Cámara de Comercio. Internacionalmente se resuelve con adaptadores
+por jurisdicción: registro mercantil, registro de compañías, Secretary of State,
+BRIS, LEI u órgano equivalente. El contrato solo recibe `hashMetadatos` de esa
+evidencia normalizada.
 
 La demo debe probar tres acciones centrales:
 
@@ -64,11 +73,11 @@ Crear `PasaporteOrigen.sol` con Solidity `^0.8.28`.
 
 Modelo minimo:
 
-- `enum Status { Active, Revoked }`.
-- `struct Product`: `issuer`, `serialHash`, `metadataHash`, `productLine`,
-  `owner`, `status`, `issuedAt`.
-- `struct Brand`: `allowed`, `name`, `metadataHash`.
-- `admin`, `lastId`, `brands`, `products`, `idBySerial`.
+- `enum Estado { Activo, Revocado }`.
+- `struct Producto`: `emisor`, `hashSerial`, `hashMetadatos`,
+  `lineaProducto`, `duenoActual`, `estado`, `emitidoEn`.
+- `struct Marca`: `autorizada`, `nombre`, `hashMetadatos`.
+- `administrador`, `ultimoId`, `marcas`, `productos`, `idPorHashSerial`.
 
 Funciones MVP:
 
@@ -99,7 +108,9 @@ Extra solo si sobra tiempo:
 - En Remix, usar `Injected Provider` conectado a Monad Testnet.
 - Desplegar desde wallet de prueba.
 - Paso 0 obligatorio tras deploy:
-  `registrarMarca(adminWallet, "Handoo Demo Brand", hashMetadatosMarca, true)`.
+  `registrarMarca(adminWallet, "Handoo Demo Brand", hashMetadatosKYB, true)`.
+  Para una marca real, ejecutar este paso solo después de completar
+  `docs/VERIFICACION_EMPRESARIAL.md`.
 - Copiar address desde Remix/explorer.
 - Copiar ABI desde compilation details.
 
@@ -145,14 +156,15 @@ Flujo base:
 
 1. Conectar wallet.
 2. Mostrar error si no esta en Monad Testnet.
-3. Emitir producto demo.
-4. Esperar receipt.
-5. Mostrar link a explorer.
-6. Verificar por serial/hash.
-7. Transferir el pasaporte a una wallet demo o comprador de prueba.
-8. Verificar `duenoActual`.
-9. Revocar producto.
-10. Verificar estado `Revoked`.
+3. Confirmar que la wallet emisora ya fue autorizada por KYB.
+4. Emitir producto demo.
+5. Esperar receipt.
+6. Mostrar link a explorer.
+7. Verificar por serial/hash.
+8. Transferir el pasaporte a una wallet demo o comprador de prueba.
+9. Verificar `duenoActual`.
+10. Revocar producto.
+11. Verificar estado `Revocado`.
 
 Estados de UI que no pueden faltar:
 
@@ -201,7 +213,7 @@ Submission:
 - `transferirProducto` solo funciona para `duenoActual`, con producto activo y
   `duenoNuevo` no nulo.
 - `revocarProducto` solo funciona para el emisor.
-- Producto revocado vuelve con estado `Revoked`.
+- Producto revocado vuelve con estado `Revocado`.
 - Tx de deploy, registro, emision, transferencia y revocacion quedan visibles
   en explorer.
 
@@ -213,6 +225,8 @@ Submission:
 - Gas limit inflado: en Monad cuesta MON real/testnet completo; mantener
   estimaciones ajustadas.
 - Revert por permisos: ejecutar `registrarMarca` antes de `emitirProducto`.
+- KYB por país: mantener adapters off-chain; no bloquear el MVP intentando
+  automatizar todos los registros internacionales.
 - Address mal copiada: copiar desde Remix o explorer, nunca a mano.
 - Handoff incompleto a frontend: usar `docs/HANDOFF_FRONTEND_MONAD.md` y
   `artifacts/frontend-config.example.json` como fuente de nombres/env.
@@ -226,5 +240,7 @@ Submission:
 - ProofFlow queda obsoleto para esta ejecucion.
 - El contrato es simple y no upgradeable.
 - No se guardan documentos, cedulas, correos ni datos personales on-chain.
+- La verificación empresarial es off-chain; on-chain solo queda el hash de
+  evidencia normalizada en `hashMetadatos`.
 - Transferencia de propiedad queda implementada como mejora MVP acotada.
 - Deploy inicial por Remix; Hardhat/Foundry solo si sobra tiempo.

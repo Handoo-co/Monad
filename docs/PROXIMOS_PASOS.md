@@ -24,30 +24,41 @@ con dueño + prioridad.
 | # | Estado | Prioridad | Tarea | Notas |
 | --- | --- | --- | --- | --- |
 | C1 | ⏳ | P0 | Deploy real de `PasaporteOrigen.sol` en Monad Testnet | Usar wallet de prueba. Ver `GUIA_DEPLOY_REMIX.md`. |
-| C2 | ⏳ | P0 | Ejecutar `registrarMarca(walletDemo, "Handoo Demo Brand", hashMarca, true)` | Sin este paso, `emitirProducto` revierte. |
+| C2 | ⏳ | P0 | Ejecutar `registrarMarca(walletDemo, "Handoo Demo Brand", hashMetadatosKYB, true)` | Solo después de completar verificación empresarial o usar metadata demo explícita. |
 | C3 | ⏳ | P0 | Compartir `VITE_PASAPORTE_ORIGEN_ADDRESS` real al equipo | Pegar en canal del equipo + actualizar host (Vercel/Netlify). |
 | C4 | ⏳ | P1 | Verificar contrato en explorer (Socialscan u oficial) | Multi-explorer si la primera API falla. |
 | C5 | ⏳ | P1 | Ejecutar Foundry tests (`forge test`) en máquina con `forge` instalado | Tests ya están en `test/PasaporteOrigen.t.sol`. |
 | C6 | ⏳ | P2 | Medir gas real de `emitirProducto` en testnet | Para no inflar `gas_limit` (Monad cobra por limit, no por usado). |
+
+## Verificación empresarial / KYB (Emmanuel + Thomas)
+
+| # | Estado | Prioridad | Tarea | Notas |
+| --- | --- | --- | --- | --- |
+| K1 | ✅ | P0 | Definir política de autorización de empresas | Documentada en `VERIFICACION_EMPRESARIAL.md`. |
+| K2 | ⏳ | P0 | Preparar flujo manual Colombia para demo | Código de verificación de Cámara de Comercio, sin guardar datos reales on-chain. |
+| K3 | ⏳ | P1 | Elegir primeros países soportados post-demo | Recomendado: Colombia, Reino Unido, Estados Unidos, UE + LEI como complemento. |
+| K4 | ⏳ | P1 | Definir JSON canónico para `hashMetadatosKYB` | Usar schema `handoo.kyb.v1`. |
+| K5 | ⏳ | P2 | Diseñar backend de adapters KYB | Endpoints futuros en `VERIFICACION_EMPRESARIAL.md`. |
 
 ## Frontend (Miguel Ángel + Thomas)
 
 | # | Estado | Prioridad | Tarea | Notas |
 | --- | --- | --- | --- | --- |
 | F1 | ⏳ | P0 | Probar conexión wallet en Monad Testnet con MON de faucet | Sin contrato real basta para validar wallet/red. |
-| F2 | ⏳ | P0 | Conectar `useIssue` real (no mock) al contrato desplegado | Reemplazar import desde `useIssue.mock` a `useIssue`. |
-| F3 | ⏳ | P0 | Conectar `useVerify` real al contrato desplegado | Mismo patrón. |
+| F2 | 🔄 | P0 | Validar `useIssue` real contra contrato desplegado | El import ya apunta a `useIssue`; falta address real + tx. |
+| F3 | 🔄 | P0 | Validar `useVerify` real contra contrato desplegado | El import ya apunta a `useVerify`; falta address real + read. |
 | F4 | ⏳ | P0 | Setear `VITE_PASAPORTE_ORIGEN_ADDRESS` en variables locales y en host de deploy | Una vez Emmanuel comparta address. |
 | F5 | ⏳ | P1 | Mapear custom errors del contrato a textos de UI | Tabla en `HANDOFF_FRONTEND_MONAD.md`. |
 | F6 | ⏳ | P1 | Estados de UI: disconnected, wrong network, pending, confirming, confirmed, failed | Mínimo viable para demo. |
 | F7 | ⏳ | P1 | Link a explorer en cada tx confirmada | Usar helpers de `HANDOFF_FRONTEND_MONAD.md`. |
 | F8 | ⏳ | P2 | Flujo de `transferirProducto` y `revocarProducto` | Demo opcional si sobra tiempo. |
+| F9 | ⏳ | P2 | UI futura de onboarding de empresa | País + autoridad + código; nunca enviar evidencia sensible al contrato. |
 
 ## Producto, pitch y submission (Thomas)
 
 | # | Estado | Prioridad | Tarea | Notas |
 | --- | --- | --- | --- | --- |
-| P1 | ⏳ | P0 | Datos demo: serial, metadata, línea de producto | Cero datos personales. Ver `GUIA_DEPLOY_REMIX.md`. |
+| P1 | ⏳ | P0 | Datos demo: empresa, serial, metadata, línea de producto | Cero datos personales y cero certificados reales. Ver `GUIA_DEPLOY_REMIX.md`. |
 | P2 | ⏳ | P0 | Guion del pitch (3 min) | Demo: emitir → verificar → transferir → revocar. |
 | P3 | ⏳ | P1 | Capturas y video de backup | Por si la red falla durante la presentación. |
 | P4 | ⏳ | P1 | README final de submission con contract address + explorer link | Editar `README.md` antes del freeze. |
@@ -68,7 +79,8 @@ con dueño + prioridad.
 - Red equivocada en demo: confirmar Chain ID `10143` antes de cada acción.
 - ABI vieja: cada redeploy obliga a recopiar address + ABI.
 - `MarcaNoAutorizada`: si el deploy se rehace, hay que repetir `registrarMarca`.
-- Datos sensibles: usar solo seriales y metadata de prueba.
+- Verificación empresarial incompleta: ninguna marca real debe autorizarse sin KYB.
+- Datos sensibles: usar solo hashes, seriales demo y metadata de prueba.
 
 ## Code freeze
 
