@@ -4,7 +4,8 @@ import { monadTestnet } from './chains';
 
 export const config = getDefaultConfig({
   appName: 'Handoo OriginPass',
-  projectId: '94e2e69b0db641d7bc18ad58e179e67f', // ID público de desarrollo genérico para el hackathon
+  // Usamos este ID público de testing para desbloquear el modal de MetaMask de inmediato
+  projectId: '3fcc6bba31a5050ce112299814243bcd', 
   chains: [monadTestnet],
-  ssr: false, // Desactivado ya que estamos usando Vite SPA puro
+  ssr: false, 
 });
