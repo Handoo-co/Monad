@@ -31,7 +31,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-neutral">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-[rgba(113,53,242,0.25)] bg-primary text-white shadow-[0_4px_20px_rgba(28,3,64,0.15)]">
+      <header className="sticky top-0 z-10 border-b border-[rgba(113,53,242,0.25)] bg-[#1C0340] text-white shadow-[0_4px_20px_rgba(28,3,64,0.15)]">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-white text-base font-bold">
