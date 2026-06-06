@@ -1,65 +1,123 @@
+import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from './components/ConnectButton'
+import { ProductShowcase } from './components/ProductShowcase'
 import { VerifyForm } from './components/VerifyForm'
 import { IssueForm } from './components/IssueForm'
 
 export default function App() {
   const { isConnected } = useAccount()
+  const [pendingSerial, setPendingSerial] = useState<string | undefined>()
+
+  const handleShowcaseVerify = (serial: string) => {
+    setPendingSerial(serial)
+    setTimeout(() => {
+      document.getElementById('verify-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
-          <div>
-            <h1 className="text-base font-bold text-gray-900">Handoo OriginPass</h1>
-            <p className="text-xs text-gray-400">Pasaporte de autenticidad en Monad</p>
+      <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600 text-white text-base font-bold">
+              H
+            </div>
+            <div>
+              <h1 className="text-sm font-bold text-gray-900 leading-none">Handoo OriginPass</h1>
+              <p className="text-[11px] text-gray-400 leading-tight">Pasaportes de autenticidad en Monad</p>
+            </div>
           </div>
           <ConnectButton />
         </div>
       </header>
 
-      {/* Estado desconectado */}
-      {!isConnected ? (
-        <div className="flex flex-col items-center justify-center gap-6 px-6 py-24 text-center">
-          <div className="text-5xl">🔏</div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Verifica la autenticidad de tu producto
-            </h2>
-            <p className="mt-2 max-w-sm mx-auto text-sm text-gray-500">
-              Conecta tu wallet para verificar o emitir pasaportes de autenticidad registrados en Monad.
-            </p>
+      <main className="mx-auto max-w-5xl px-4 py-8 space-y-8">
+        {/* Hero */}
+        <section className="rounded-2xl bg-gradient-to-br from-purple-700 to-purple-900 px-8 py-10 text-white">
+          <p className="text-xs font-semibold uppercase tracking-widest text-purple-300">
+            Powered by Monad Testnet · Chain 10143
+          </p>
+          <h2 className="mt-2 text-2xl font-bold leading-snug max-w-xl">
+            Cualquier empresa certifica cada producto<br />
+            usando el serial que ya tiene.
+          </h2>
+          <p className="mt-3 text-sm text-purple-200 max-w-lg">
+            El comprador escanea un QR y confirma que la unidad fue emitida por la marca y no fue revocada —
+            sin confiar en el vendedor.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-6 text-xs text-purple-300">
+            <span>⚡ 400ms block time</span>
+            <span>10,000 TPS</span>
+            <span>🔒 Pasaporte por unidad</span>
+            <span>📦 Sin rediseñar fabricación</span>
           </div>
-          <ConnectButton />
+        </section>
+
+        {/* Two-column layout: catalog + verify/issue panel */}
+        <div className="grid gap-8 lg:grid-cols-5">
+          {/* Left: Product catalog */}
+          <div className="lg:col-span-3">
+            <ProductShowcase onVerify={handleShowcaseVerify} />
+          </div>
+
+          {/* Right: Verify + Issue panel (sticky on desktop) */}
+          <div className="lg:col-span-2">
+            <div className="lg:sticky lg:top-24 space-y-6">
+              {/* Verify section */}
+              <section
+                id="verify-section"
+                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+              >
+                <div className="mb-4">
+                  <h2 className="text-base font-bold text-gray-900">Verificar autenticidad</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Ingresa o selecciona un serial para ver el sello.
+                  </p>
+                </div>
+                <VerifyForm
+                  initialSerial={pendingSerial}
+                  onSerialConsumed={() => setPendingSerial(undefined)}
+                />
+              </section>
+
+              {/* Issue section */}
+              {isConnected ? (
+                <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-base font-bold text-gray-900">Emitir pasaporte</h2>
+                      <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-semibold text-purple-700">
+                        Marca
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Solo wallets registradas como emisores.
+                    </p>
+                  </div>
+                  <IssueForm />
+                </section>
+              ) : (
+                <div className="rounded-2xl border border-purple-100 bg-gradient-to-br from-purple-50 to-white p-5 text-center">
+                  <p className="text-sm font-semibold text-purple-900">¿Eres una marca?</p>
+                  <p className="mt-1 text-xs text-purple-500">
+                    Conecta tu wallet para emitir pasaportes de autenticidad a tus productos.
+                  </p>
+                  <div className="mt-4 flex justify-center">
+                    <ConnectButton />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      ) : (
-        <main className="mx-auto max-w-2xl space-y-10 px-4 py-8">
-          {/* Verificación — pantalla principal del comprador */}
-          <section>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Verificar producto</h2>
-              <p className="text-sm text-gray-400">
-                Ingresa el serial o usa los botones de demo.
-              </p>
-            </div>
-            <VerifyForm />
-          </section>
+      </main>
 
-          <div className="border-t border-gray-200" />
-
-          {/* Emisión — solo para la marca autorizada */}
-          <section>
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Emitir pasaporte</h2>
-              <p className="text-sm text-gray-400">
-                Solo wallets autorizadas como emisores pueden usar esta sección.
-              </p>
-            </div>
-            <IssueForm />
-          </section>
-        </main>
-      )}
+      <footer className="mt-12 border-t border-gray-100 py-6 text-center text-xs text-gray-400">
+        Handoo OriginPass · MonadBlitz Medellín · Chain ID 10143
+      </footer>
     </div>
   )
 }
