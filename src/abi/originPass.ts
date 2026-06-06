@@ -1,6 +1,7 @@
-// ABI generada desde Remix → Compilation Details → ABI
-// Emmanuel completa esto después del deploy
-export const originPassAbi = [] as const
+import type { Abi } from 'viem'
 
-// Emmanuel completa esto después del deploy
+// Emmanuel: pega el ABI de Remix → Compilation Details → ABI
+export const originPassAbi: Abi = []
+
+// Emmanuel: pega la dirección del contrato desplegado en Monad Testnet
 export const ORIGINPASS_ADDRESS = '' as `0x${string}`
