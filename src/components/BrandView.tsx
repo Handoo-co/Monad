@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useBrandPassports } from '../hooks/useBrandPassports.mock'
 import { EXPLORER_URL } from '../config/chains'
 import { QRCodeLink } from './QRCodeLink'
+import { ConnectButton } from './ConnectButton'
 import type { AdminProduct } from '../data/adminDemo'
 
 type Filter = 'all' | 'active' | 'revoked'
@@ -11,7 +12,23 @@ export function BrandView() {
   const [filter, setFilter] = useState<Filter>('all')
   const [confirmingSerial, setConfirmingSerial] = useState<string | null>(null)
 
-  if (!brand) return null
+  if (!brand) return (
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-50 text-3xl">
+        🏢
+      </div>
+      <h2 className="mt-5 text-lg font-bold text-gray-900">Portal de Empresas</h2>
+      <p className="mt-2 max-w-sm text-sm text-gray-500">
+        Conecta la wallet registrada como emisor para ver y gestionar los pasaportes de autenticidad de tu empresa.
+      </p>
+      <div className="mt-6">
+        <ConnectButton />
+      </div>
+      <p className="mt-4 text-xs text-gray-400">
+        Solo wallets aprobadas por Handoo pueden acceder a este portal.
+      </p>
+    </div>
+  )
 
   const active = products.filter(p => p.status === 'active').length
   const revoked = products.filter(p => p.status === 'revoked').length

@@ -75,10 +75,6 @@ export default function App() {
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Panel de marca</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Gestiona los pasaportes registrados bajo tu wallet.</p>
-        </div>
         <BrandView />
       </main>
       <footer className="mt-12 border-t border-gray-100 py-6 text-center text-xs text-gray-400">
@@ -102,14 +98,16 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {isConnected && (
-              <button
-                onClick={() => setView('brand')}
-                className="rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 transition-colors"
-              >
-                Mi Panel
-              </button>
-            )}
+            <button
+              onClick={() => setView('brand')}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                isConnected
+                  ? 'border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100'
+                  : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+              }`}
+            >
+              Empresas
+            </button>
             <button
               onClick={() => setView('admin')}
               className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-colors"

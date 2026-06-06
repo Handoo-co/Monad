@@ -1,4 +1,5 @@
 import { DEMO_PRODUCTS } from '../data/demo'
+import { QRCodeLink } from './QRCodeLink'
 
 type Props = {
   onVerify: (serial: string) => void
@@ -82,12 +83,14 @@ export function ProductShowcase({ onVerify }: Props) {
                 </div>
               )}
 
-              {/* Footer serial + CTA */}
+              {/* Footer serial + QR */}
               <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
                 <span className="font-mono text-[11px] text-gray-400">{p.serial}</span>
-                <span className="text-xs font-medium text-purple-600 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                  Ver sello →
-                </span>
+                {p.scenario !== 'notfound' && (
+                  <div onClick={e => e.stopPropagation()}>
+                    <QRCodeLink serial={p.serial} size={56} />
+                  </div>
+                )}
               </div>
             </button>
           )
